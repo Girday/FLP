@@ -1,1 +1,10 @@
 *swipl/
+
+*.vscode
+*.vcxproj*                  
+*.sln                       
+*.vcuser*                   
+*.opensdf *.sdf             
+*.ipch *.pch *.ncb          
+*.suo *.user *.userosscache 
+*.vscode/
