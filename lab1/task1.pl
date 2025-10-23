@@ -2,6 +2,8 @@
 % 1. Вариант 6. Удаление N последних элементов
 % 2. Вариант 11. Вычисление позиции максимального элемента в списке
 
+:- encoding(utf8).
+
 remove_last_n_std(List, N, Result) :-
     length(List, Len),
     KeepLen is Len - N,
