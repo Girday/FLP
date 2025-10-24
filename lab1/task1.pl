@@ -6,14 +6,15 @@
 
 :- encoding(utf8).
 
-
+% 1.
+% std
 remove_last_n_std(List, N, Result) :-
     length(List, Len),
     KeepLen is Len - N,
     length(Result, KeepLen),
     append(Result, _, List).
 
-
+% rec
 remove_last_n_rec(List, N, Result) :-
     length_rec(List, Len),
     KeepLen is Len - N,
@@ -30,12 +31,13 @@ take_n_rec([H|T], N, [H|R]) :-
     N1 is N - 1,
     take_n_rec(T, N1, R).
 
-
+% 2.
+% std
 max_pos_std(List, Pos) :-
     max_list(List, Max),
     nth1(Pos, List, Max).
 
-
+% rec
 max_pos_rec([H|T], Pos) :-
     max_pos_rec(T, 2, H, 1, Pos).
 
