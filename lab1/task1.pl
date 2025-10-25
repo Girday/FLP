@@ -69,17 +69,12 @@ append_rec([H|T], L2, [H|R]) :-
 
 permute_rec([], []).
 permute_rec(L, [H|T]) :-
-    select(H, L, Rest),
+    remove_rec(H, L, Rest),
     permute_rec(Rest, T).
 
 remove_rec(X, [X|T], T).
 remove_rec(X, [H|T], [H|R]) :-
     remove_rec(X, T, R).
-
-permute_rec([], []).
-permute_rec(L, [H|T]) :-
-    remove_rec(H, L, Rest),
-    permute_rec(Rest, T).
 
 sublist_rec(Sub, List) :-
     append_rec(_, Rest, List),
