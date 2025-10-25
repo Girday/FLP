@@ -1,12 +1,15 @@
 /*
     task1.pl
-    1. Вариант 6. Удаление N последних элементов
-    2. Вариант 11. Вычисление позиции максимального элемента в списке
+        1. Вариант 6. Удаление N последних элементов списка
+        2. Вариант 11. Вычисление позиции максимального элемента в списке
+        3. Реализовать свои версии стандартных предикатов обработки списков, 
+            рассмотренные на занятии (length, member, append, remove, permute, sublist), 
+            убедиться в их работоспособности на ряде различных запросов.
 */
 
 :- encoding(utf8).
 
-% 1.
+% 1
 % std
 remove_last_n_std(List, N, Result) :-
     length(List, Len),
@@ -20,18 +23,13 @@ remove_last_n_rec(List, N, Result) :-
     KeepLen is Len - N,
     take_n_rec(List, KeepLen, Result).
 
-length_rec([], 0).
-length_rec([_|T], L) :-
-    length_rec(T, L1),
-    L is L1 + 1.
-
 take_n_rec(_, 0, []) :- !.
 take_n_rec([], _, []).
 take_n_rec([H|T], N, [H|R]) :-
     N1 is N - 1,
     take_n_rec(T, N1, R).
 
-% 2.
+% 2
 % std
 max_pos_std(List, Pos) :-
     max_list(List, Max),
@@ -52,3 +50,37 @@ max_pos_rec([H|T], CurPos, CurMax, MaxPos, ResultPos) :-
     ),
     NextPos is CurPos + 1,
     max_pos_rec(T, NextPos, NewMax, NewMaxPos, ResultPos).
+
+
+% 3
+% my
+length_rec([], 0).
+length_rec([_|T], N) :-
+    length_rec(T, N1),
+    N is N1 + 1.
+
+member_rec(X, [X|_]).
+member_rec(X, [_|T]) :-
+    member_rec(X, T).
+
+append_rec([], L, L).
+append_rec([H|T], L2, [H|R]) :-
+    append_rec(T, L2, R).
+
+permute_rec([], []).
+permute_rec(L, [H|T]) :-
+    select(H, L, Rest),
+    permute_rec(Rest, T).
+
+remove_rec(X, [X|T], T).
+remove_rec(X, [H|T], [H|R]) :-
+    remove_rec(X, T, R).
+
+permute_rec([], []).
+permute_rec(L, [H|T]) :-
+    remove_rec(H, L, Rest),
+    permute_rec(Rest, T).
+
+sublist_rec(Sub, List) :-
+    append_rec(_, Rest, List),
+    append_rec(Sub, _, Rest).
