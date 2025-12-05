@@ -79,7 +79,6 @@ solve_dfs(Solution) :-
     get_time(T1),
     Time is T1 - T0,
     length(Solution, Len),
-    format('~n=== ПОИСК В ГЛУБИНУ (DFS) ===~n', []),
     format('Решение найдено за ~3f сек~n', [Time]),
     format('Длина пути: ~d ходов~n', [Len]).
 
@@ -106,7 +105,6 @@ solve_bfs(Solution) :-
     get_time(T1),
     Time is T1 - T0,
     length(Solution, Len),
-    format('~n=== ПОИСК В ШИРИНУ (BFS) ===~n', []),
     format('Решение найдено за ~3f сек~n', [Time]),
     format('Длина пути: ~d ходов~n', [Len]).
 
@@ -133,7 +131,6 @@ solve_iddfs(Solution) :-
     get_time(T1),
     Time is T1 - T0,
     length(Solution, Len),
-    format('~n=== ИТЕРАТИВНОЕ УГЛУБЛЕНИЕ (IDDFS) ===~n', []),
     format('Решение найдено за ~3f сек~n', [Time]),
     format('Длина пути: ~d ходов~n', [Len]).
 
@@ -159,144 +156,3 @@ try_children_iddfs([Child|_], Goal, Limit, PathSoFar, Path) :-
     dfs_limited_id(Child, Goal, Limit, [Child|PathSoFar], Path), !.
 try_children_iddfs([_|Rest], Goal, Limit, PathSoFar, Path) :-
     try_children_iddfs(Rest, Goal, Limit, PathSoFar, Path).
-
-
-% ЭВРИСТИКИ И HEURISTIC-SEARCH
-
-heuristic(State, H) :-
-    goal_state(Goal),
-    findall(1,
-        ( nth0(I, State, X),
-          nth0(I, Goal, Y),
-          X \= Y,
-          X \= п
-        ),
-        L),
-    length(L, H).
-
-
-% ЭВРИСТИЧЕСКИЙ ПОИСК (A*)
-
-solve_astar(Solution) :-
-    start_state(Start),
-    goal_state(Goal),
-    get_time(T0),
-    heuristic(Start, H0),
-    astar([node(Start,[Start],0,H0)], Goal, RevPath, NodesExpanded),
-    reverse(RevPath, Solution),
-    get_time(T1),
-    Time is T1 - T0,
-    length(Solution, Len),
-    format('~n=== ЭВРИСТИЧЕСКИЙ ПОИСК (A*) ===~n', []),
-    format('Решение найдено за ~3f сек~n', [Time]),
-    format('Длина пути: ~d ходов~n', [Len]),
-    format('Расширено узлов: ~d~n', [NodesExpanded]).
-
-astar(Open, Goal, Path, NodesExpanded) :-
-    select_best_node(Open, node(State, PathSoFar, G, _F), RestOpen),
-    ( State = Goal ->
-        Path = PathSoFar, NodesExpanded = 1
-    ;
-        findall(node(Next, [Next|PathSoFar], G1, F1),
-            ( move(State, Next, _),
-              \+ member(Next, PathSoFar),
-              G1 is G + 1,
-              heuristic(Next, H1),
-              F1 is G1 + H1
-            ),
-            Children),
-        append(RestOpen, Children, NewOpen),
-        astar(NewOpen, Goal, Path, NodesExpandedRest),
-        NodesExpanded is NodesExpandedRest + 1
-    ).
-
-select_best_node([N], N, []) :- !.
-select_best_node([node(S,P,G,F)|T], Best, [Other|Rest]) :-
-    select_best_node(T, Best1, Rest1),
-    Best1 = node(_,_,G1,F1),
-    ( F < F1 -> Best = node(S,P,G,F), Other = Best1, Rest = Rest1
-    ; F =:= F1, G =< G1 -> Best = node(S,P,G,F), Other = Best1, Rest = Rest1
-    ; Best = Best1, Other = node(S,P,G,F), Rest = Rest1
-    ).
-
-
-% ЖАДНЫЙ ПОИСК (GREEDY BEST-FIRST)
-
-solve_greedy(Solution) :-
-    start_state(Start),
-    goal_state(_),
-    get_time(T0),
-    heuristic(Start, H0),
-    greedy([gnode(Start,[Start],H0)], RevPath, Nodes),
-    reverse(RevPath, Solution),
-    get_time(T1),
-    Time is T1 - T0,
-    length(Solution, Len),
-    format('~n=== ЖАДНЫЙ ПОИСК (GREEDY BEST-FIRST) ===~n', []),
-    format('Решение найдено за ~3f сек~n', [Time]),
-    format('Длина пути: ~d ходов~n', [Len]),
-    format('Расширено узлов: ~d~n', [Nodes]).
-
-greedy(Open, Path, NodesExpanded) :-
-    select_best_greedy(Open, gnode(State, PathSoFar, _H), Rest),
-    ( goal_state(Goal), State = Goal ->
-        Path = PathSoFar, NodesExpanded = 1
-    ;
-        findall(gnode(Next, [Next|PathSoFar], Hn),
-            ( move(State, Next, _), \+ member(Next, PathSoFar), heuristic(Next, Hn) ),
-            Children),
-        append(Rest, Children, NewOpen),
-        greedy(NewOpen, Path, NodesRest),
-        NodesExpanded is NodesRest + 1
-    ).
-
-select_best_greedy([X], X, []) :- !.
-select_best_greedy([gnode(S,P,H)|T], Best, [Other|Rest]) :-
-    select_best_greedy(T, Best1, Rest1),
-    Best1 = gnode(_,_,H1),
-    ( H < H1 -> Best = gnode(S,P,H), Other = Best1, Rest = Rest1
-    ; Best = Best1, Other = gnode(S,P,H), Rest = Rest1
-    ).
-
-
-% ИТЕРАТИВНОЕ УГЛУБЛЕНИЕ (IDA*)
-
-solve_idastar(Solution) :-
-    start_state(Start),
-    goal_state(_Goal),
-    get_time(T0),
-    heuristic(Start, H0),
-    MaxBoundLimit = 200,
-    ida_loop([Start], 0, H0, MaxBoundLimit, Solution),
-    get_time(T1),
-    Time is T1 - T0,
-    length(Solution, Len),
-    format('~n=== ИТЕРАТИВНОЕ УГЛУБЛЕНИЕ (IDA*) ===~n', []),
-    format('Решение найдено за ~3f сек~n', [Time]),
-    format('Длина пути: ~d ходов~n', [Len]).
-
-ida_loop(StartPath, _G, Bound, MaxBound, Solution) :-
-    Bound =< MaxBound,
-    ( depth_limited_f(StartPath, 0, Bound, Solution) ->
-        true
-    ; Bound1 is Bound + 1,
-      ida_loop(StartPath, 0, Bound1, MaxBound, Solution)
-    ).
-
-depth_limited_f(Path, G, Bound, Solution) :-
-    Path = [Node|_],
-    heuristic(Node, H),
-    F is G + H,
-    F =< Bound,
-    ( goal_state(Goal), Node = Goal ->
-        reverse(Path, Solution)
-    ;
-        findall(Next, ( move(Node, Next, _), \+ member(Next, Path) ), Nexts),
-        G1 is G + 1,
-        try_nexts(Nexts, Path, G1, Bound, Solution)
-    ).
-
-try_nexts([N|_], Path, G, Bound, Solution) :-
-    depth_limited_f([N|Path], G, Bound, Solution), !.
-try_nexts([_|T], Path, G, Bound, Solution) :-
-    try_nexts(T, Path, G, Bound, Solution).
