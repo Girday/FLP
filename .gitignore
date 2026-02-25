@@ -8,3 +8,5 @@
 *.ipch *.pch *.ncb          
 *.suo *.user *.userosscache 
 *.vscode/
+
+task-repo/
