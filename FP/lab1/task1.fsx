@@ -6,7 +6,7 @@ let segments = 10
 let eps = 1e-8
 
 let builtin x =
-    2.0 * ((cos x) * (cos x) - 1.0)
+    2.0 * (cos x * cos x - 1.0)
 
 let rec factorial n =
     if n <= 1 then 1.0
@@ -14,7 +14,7 @@ let rec factorial n =
 
 let taylorTermNaive x n =
     let sign = if n % 2 = 0 then 1.0 else -1.0
-    sign * (pown (2.0 * x) (2 * n)) / factorial (2 * n)
+    sign * pown (2.0 * x) (2 * n) / factorial (2 * n)
 
 let taylorNaive x eps =
     let rec loop n sum terms =
