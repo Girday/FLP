@@ -27,7 +27,7 @@ let taylorNaive x eps =
     loop 1 0.0 0
 
 let taylorSmart x eps =
-    let firstTerm = -((2.0 * x) * (2.0 * x)) / 2.0
+    let firstTerm = -(2.0 * x * 2.0 * x) / 2.0
 
     let rec loop n term sum terms =
         if abs term < eps then
@@ -35,7 +35,7 @@ let taylorSmart x eps =
         else
             let nextTerm =
                 term
-                * (-(4.0 * x * x))
+                * -(4.0 * x * x)
                 / (float (2 * n + 1) * float (2 * n + 2))
 
             loop (n + 1) nextTerm (sum + term) (terms + 1)
@@ -47,7 +47,7 @@ let printTable =
     printfn "-----------------------------------------------------------------------------------------------"
 
     for i in 0 .. segments do
-        let x = a + (float i) * (b - a) / float segments
+        let x = a + float i * (b - a) / float segments
         let fx = builtin x
         let smart, smartTerms = taylorSmart x eps
         let dumb, dumbTerms = taylorNaive x eps
