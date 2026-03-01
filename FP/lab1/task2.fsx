@@ -3,7 +3,7 @@ open System
 let eps = 1e-8
 let maxIterations = 10_000
 
-let dichotomy (f: float -> float) (a: float) (b: float) (eps: float) (maxIter: int) =
+let dichotomy f a b eps maxIter =
     let fa = f a
     let fb = f b
 
@@ -23,7 +23,7 @@ let dichotomy (f: float -> float) (a: float) (b: float) (eps: float) (maxIter: i
 
     loop a b fa 0
 
-let iterations (phi: float -> float) (x0: float) (eps: float) (maxIter: int) =
+let iterations phi x0 eps maxIter =
     let rec loop x iter =
         let next = phi x
 
@@ -34,7 +34,7 @@ let iterations (phi: float -> float) (x0: float) (eps: float) (maxIter: int) =
 
     loop x0 0
 
-let newton (f: float -> float) (f': float -> float) (x0: float) (eps: float) (maxIter: int) =
+let newton f f' x0 eps maxIter =
     let phi x = x - f x / f' x
     iterations phi x0 eps maxIter
 
