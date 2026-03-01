@@ -5,20 +5,18 @@ let b = 0.5
 let segments = 10
 let eps = 1e-8
 
-let builtin (x: float) =
+let builtin x =
     2.0 * ((cos x) * (cos x) - 1.0)
 
-let factorial (n: int) =
-    let rec loop i acc =
-        if i <= 1 then acc
-        else loop (i - 1) (acc * float i)
-    loop n 1.0
+let rec factorial n =
+    if n <= 1 then 1.0
+    else float n * factorial (n - 1)
 
-let taylorTermNaive (x: float) (n: int) =
+let taylorTermNaive x n =
     let sign = if n % 2 = 0 then 1.0 else -1.0
     sign * (pown (2.0 * x) (2 * n)) / factorial (2 * n)
 
-let taylorNaive (x: float) (eps: float) =
+let taylorNaive x eps =
     let rec loop n sum terms =
         let term = taylorTermNaive x n
         if abs term < eps then
@@ -28,7 +26,7 @@ let taylorNaive (x: float) (eps: float) =
 
     loop 1 0.0 0
 
-let taylorSmart (x: float) (eps: float) =
+let taylorSmart x eps =
     let firstTerm = -((2.0 * x) * (2.0 * x)) / 2.0
 
     let rec loop n term sum terms =
@@ -44,7 +42,7 @@ let taylorSmart (x: float) (eps: float) =
 
     loop 1 firstTerm 0.0 0
 
-let printTable () =
+let printTable =
     printfn "%6s | %14s | %14s | %7s | %14s | %7s" "x" "Builtin" "Smart Taylor" "# terms" "Dumb Taylor" "# terms"
     printfn "-----------------------------------------------------------------------------------------------"
 
@@ -57,4 +55,4 @@ let printTable () =
         printfn "%6.3f | %14.10f | %14.10f | %7d | %14.10f | %7d"
             x fx smart smartTerms dumb dumbTerms
 
-printTable ()
+printTable
