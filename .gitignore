@@ -11,3 +11,4 @@
 
 task-repo/
 .fake
+*.DS_Store/
